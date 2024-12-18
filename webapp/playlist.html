@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mood Music</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<style>
+    body, html {
+        margin: 0;
+        padding: 0;
+        font-family: Arial, sans-serif;
+        background: linear-gradient(to bottom right, #3f0071, #340d87, #18085a);
+        color: white;
+    }
+    .min-h-screen {
+        min-height: 100vh;
+    }
+    .bg-gradient-to-br {
+        background: linear-gradient(to bottom right, #3f0071, #340d87, #18085a);
+    }
+    .p-8 {
+        padding: 2rem;
+    }
+    .max-w-6xl {
+        max-width: 1200px;
+    }
+    .mx-auto {
+        margin: 0 auto;
+    }
+    .text-center {
+        text-align: center;
+    }
+    .text-4xl {
+        font-size: 2.25rem;
+    }
+    .font-bold {
+        font-weight: bold;
+    }
+    .mb-12 {
+        margin-bottom: 3rem;
+    }
+    .mb-8 {
+        margin-bottom: 2rem;
+    }
+    .text-purple-200 {
+        color: #d1c4e9;
+    }
+    .grid {
+        display: grid;
+    }
+    .grid-cols-2 {
+        grid-template-columns: repeat(2, 1fr);
+    }
+    .sm\\:grid-cols-3 {
+        grid-template-columns: repeat(3, 1fr);
+    }
+    .md\\:grid-cols-6 {
+        grid-template-columns: repeat(6, 1fr);
+    }
+    .gap-4 {
+        gap: 1rem;
+    }
+    .p-4 {
+        padding: 1rem;
+    }
+    .rounded-xl {
+        border-radius: 0.75rem;
+    }
+    .bg-white-20 {
+        background-color: rgba(255, 255, 255, 0.2);
+    }
+    .mood-button {
+        padding: 15px;
+        border-radius: 15px;
+        font-size: 16px;
+        font-weight: bold;
+        color: black;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        text-align: center;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 5px;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+    }
+    
+    .mood-button:hover {
+        transform: scale(1.1);
+        box-shadow: 0 8px 15px rgba(0, 0, 0, 0.4);
+    }
+
+    /* Add smooth scaling effect */
+.mood-button:hover {
+    transform: scale(1.1);
+}
+
+/* Adjust button text */
+.mood-button span {
+    font-size: 14px;
+}
+    
+</style>
+<body>
+    <div class="min-h-screen bg-gradient-to-br from-purple-900 via-purple-800 to-indigo-900 text-white p-8">
+        <div class="max-w-6xl mx-auto">
+            <header class="mb-12 text-center">
+                <h1 class="text-4xl font-bold mb-4 flex items-center justify-center gap-3">
+                    <span class="music-icon">🎵</span>
+                    Mood Music
+                </h1>
+                <p class="text-purple-200">Find the perfect soundtrack for your mood</p>
+            </header>
+
+            <div id="mood-buttons" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-4 mb-8"></div>
+
+            <div id="song-list" class="space-y-4"></div>
+        </div>
+    </div>
+    <script>
+    console.log("JavaScript is loaded and running.");
+
+        // Mood data
+const moods = [
+{ name: 'All', icon: '🎵' },
+{ name: 'Happy', icon: '😊' },
+{ name: 'Sad', icon: '😢' },
+{ name: 'Excited', icon: '🎉' },
+{ name: 'Chill', icon: '☕' },
+{ name: 'Relaxed', icon: '🌙' }
+];
+
+// Song data
+let songs = [
+{
+    id: 1,
+    title: "Dancing in the Moonlight",
+    artist: "Toploader",
+    mood: "Happy",
+    duration: "3:52",
+    liked: false,
+    cover: "https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?w=300&h=300&fit=crop"
+},
+{
+    id: 2,
+    title: "Someone Like You",
+    artist: "Adele",
+    mood: "Sad",
+    duration: "4:45",
+    liked: true,
+    cover: "https://images.unsplash.com/photo-1494232410401-ad00d5433cfa?w=300&h=300&fit=crop"
+},
+{
+    id: 3,
+    title: "Can't Hold Us",
+    artist: "Macklemore",
+    mood: "Excited",
+    duration: "4:18",
+    liked: false,
+    cover: "https://images.unsplash.com/photo-1514525253161-7a46d19cd819?w=300&h=300&fit=crop"
+},
+{
+    id: 4,
+    title: "Sunday Morning",
+    artist: "Maroon 5",
+    mood: "Chill",
+    duration: "4:02",
+    liked: true,
+    cover: "https://images.unsplash.com/photo-1507838153414-b4b713384a76?w=300&h=300&fit=crop"
+},
+{
+    id: 5,
+    title: "Weightless",
+    artist: "Macaroni Union",
+    mood: "Relaxed",
+    duration: "8:05",
+    liked: false,
+    cover: "https://images.unsplash.com/photo-1508700115892-45ecd05ae2ad?w=300&h=300&fit=crop"
+}
+];
+
+let selectedMood = 'All';
+let playing = null;
+
+document.addEventListener('DOMContentLoaded', () => {
+renderMoods();
+renderSongs();
+});
+
+function renderMoods() {
+const moodButtons = document.getElementById('mood-buttons');
+moodButtons.innerHTML = '';
+
+moods.forEach(mood => {
+    const button = document.createElement('button');
+    button.className = 'mood-button';
+    button.textContent = `${mood.icon} ${mood.name}`;
+    button.addEventListener('click', () => {
+        selectedMood = mood.name;
+        renderSongs();
+    });
+    moodButtons.appendChild(button);
+});
+}
+
+function renderSongs() {
+const songList = document.getElementById('song-list');
+songList.innerHTML = '';
+
+const filteredSongs = selectedMood === 'All' ? songs : songs.filter(song => song.mood === selectedMood);
+
+filteredSongs.forEach(song => {
+    const songDiv = document.createElement('div');
+    songDiv.className = 'song';
+
+    songDiv.innerHTML = `
+        <img src="${song.cover}" class="song-cover" alt="${song.title}">
+        <div class="song-info">
+            <h3>${song.title}</h3>
+            <p>${song.artist}</p>
+        </div>
+        <span>${song.mood}</span>
+        <span>${song.duration}</span>
+    `;
+
+    songList.appendChild(songDiv);
+});
+}
+
+    </script>
+</body>
+</html>

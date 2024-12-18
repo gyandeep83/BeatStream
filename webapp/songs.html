@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Music Player</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f8f9fa;
+            padding: 20px;
+            margin: 0;
+        }
+
+        h1 {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .song-list {
+            list-style-type: none;
+            padding: 0;
+            max-width: 600px;
+            margin: auto;
+        }
+
+        .song-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 10px 15px;
+            background-color: #fff;
+            border-radius: 8px;
+            margin-bottom: 10px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .song-title {
+            font-size: 1em;
+        }
+
+        .play-button {
+            background-color: #4f46e5;
+            color: #fff;
+            border: none;
+            border-radius: 50%;
+            width: 35px;
+            height: 35px;
+            font-size: 18px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        footer.music-controls {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background-color: #4f46e5;
+            color: #fff;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 20px;
+            box-shadow: 0 -2px 5px rgba(0, 0, 0, 0.2);
+        }
+
+        .song-info {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .song-cover {
+            width: 50px;
+            height: 50px;
+            background-color: #6c757d;
+            border-radius: 8px;
+        }
+
+        .song-details {
+            line-height: 1.2;
+        }
+
+        .progress-bar {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .progress-bar input[type="range"] {
+            width: 150px;
+        }
+
+        .controls {
+            display: flex;
+            gap: 10px;
+        }
+
+        .control-btn {
+            background-color: transparent;
+            border: none;
+            color: #fff;
+            font-size: 18px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <h1>Music Playlist</h1>
+
+    <ul class="song-list">
+        <li class="song-item">
+            <span class="song-title">Blinding lights - The Weeknd</span>
+            <button class="play-button" data-song="/audio/not-afraid.mp3">▶️</button>
+        </li>
+        <li class="song-item">
+            <span class="song-title">Old money - AP Dhillon</span>
+            <button class="play-button" data-song="song2.mp3">▶️</button>
+        </li>
+        <!-- Add more songs similarly -->
+    </ul>
+
+    <footer class="music-controls">
+        <div class="song-info">
+            <div class="song-cover"></div>
+            <div class="song-details">
+                <p class="song-title">Song Title</p>
+                <p class="artist-name">Artist Name</p>
+            </div>
+        </div>
+        <div class="progress-bar">
+            <span class="time current-time">0:00</span>
+            <input type="range" min="0" max="100" value="0" class="progress" />
+            <span class="time total-time">0:00</span>
+        </div>
+        <div class="controls">
+            <button class="control-btn play-pause">▶️</button>
+        </div>
+    </footer>
+
+    <script>
+        const playButtons = document.querySelectorAll('.play-button');
+        const playPauseBtn = document.querySelector('.play-pause');
+        const songTitle = document.querySelector('.song-details .song-title');
+        const artistName = document.querySelector('.song-details .artist-name');
+        const currentTimeElement = document.querySelector('.current-time');
+        const totalTimeElement = document.querySelector('.total-time');
+        const progressBar = document.querySelector('.progress');
+
+        let currentAudio = null;
+
+        function formatTime(seconds) {
+            const minutes = Math.floor(seconds / 60);
+            const secs = Math.floor(seconds % 60).toString().padStart(2, '0');
+            return `${minutes}:${secs}`;
+        }
+
+        playButtons.forEach(button => {
+            button.addEventListener('click', function() {
+                const song = this.getAttribute('data-song');
+                if (currentAudio) {
+                    currentAudio.pause();
+                }
+                currentAudio = new Audio(song);
+                currentAudio.play();
+
+                const songDetails = this.parentElement.querySelector('.song-title').textContent.split(' - ');
+                songTitle.textContent = songDetails[0];
+                artistName.textContent = songDetails[1];
+
+                playPauseBtn.textContent = '⏸️';
+                setupAudioControls(currentAudio);
+            });
+        });
+
+        function setupAudioControls(audio) {
+            audio.addEventListener('timeupdate', () => {
+                progressBar.value = (audio.currentTime / audio.duration) * 100;
+                currentTimeElement.textContent = formatTime(audio.currentTime);
+                totalTimeElement.textContent = formatTime(audio.duration);
+            });
+
+            progressBar.addEventListener('input', () => {
+                const seekTime = (progressBar.value / 100) * audio.duration;
+                audio.currentTime = seekTime;
+            });
+
+            audio.addEventListener('ended', () => {
+                playPauseBtn.textContent = '▶️';
+            });
+        }
+
+        playPauseBtn.addEventListener('click', function() {
+            if (currentAudio) {
+                if (currentAudio.paused) {
+                    currentAudio.play();
+                    this.textContent = '⏸️';
+                } else {
+                    currentAudio.pause();
+                    this.textContent = '▶️';
+                }
+            }
+        });
+    </script>
+</body>
+</html>
